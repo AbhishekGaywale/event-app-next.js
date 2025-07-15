@@ -87,7 +87,7 @@ export default function ContactUsPage() {
 
                 <button
                   type="submit"
-                  className="bg-[#fbbd60] text-white px-6 py-2 rounded-full mt-2 hover:bg-[#f9a42a] flex items-center gap-2"
+                  className="bg-[#a7ecf8] text-sky-700 px-6 py-2 rounded-full mt-2 hover:bg-[#e1e8ea] flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2.01 21l20.99-9L2.01 3v7l15 2-15 2z" />

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Poppins } from "next/font/google";
 import ContactUsPage from "@/app/contact/page";
 import { motion } from "framer-motion";
+import EventCard from "@/app/component/EventCard";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -100,7 +101,7 @@ export default function EventDetailPage() {
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7 }}
         viewport={{ once: true }}
-        className="bg-white/80 backdrop-blur-md p-8 md:p-10 rounded-3xl shadow-xl"
+        className="bg-transparent backdrop-blur-md p-8 md:p-10 rounded-3xl shadow"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-[#3b310b] mb-6">
           What’s Included
@@ -136,6 +137,18 @@ export default function EventDetailPage() {
       </motion.div>
     </div>
   </div>
+{event.slug === "birthday" && (
+  <div className="px-4 md:px-6 py-10 bg-white">
+    <h3 className="text-2xl font-bold text-[#3b310b] mb-6">Similar Packages</h3>
+    <EventCard
+      title="Birthday Party"
+      rating="4.5"
+      description="Celebrate your kid's birthday with balloons, cake, and fun themes."
+      imageUrl="/images/theme.jpg"
+    />
+  </div>
+)}
+
 
   {/* Contact Section */}
   <div className="bg-white py-16 px-4 md:px-6">
