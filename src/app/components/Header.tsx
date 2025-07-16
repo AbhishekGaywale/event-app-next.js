@@ -10,7 +10,14 @@ const Header = () => {
   const [dots, setDots] = useState<React.ReactElement[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  const navItems = ["Home", "Services", "About", "Gallery", "Contact"];
+  const navItems = [
+    "Home",
+    "Services",
+    "About",
+    "Gallery",
+    "Contact",
+    "Dashboard",
+  ];
 
   useEffect(() => {
     setIsClient(true);
@@ -32,8 +39,7 @@ const Header = () => {
 
   return (
     <header className="bg-[#1f2937] text-black top-0 z-50 w-full  overflow-hidden">
-      {/* Floating dots - optional */}
-      {/* {isClient && <div className="absolute inset-0 z-0 pointer-events-none">{dots}</div>} */}
+      
 
       {/* Desktop Header */}
       <div className="hidden md:flex items-center justify-between px-10 py-4 max-w-7xl mx-auto">
@@ -54,7 +60,11 @@ const Header = () => {
         {/* Right: Navigation */}
         <nav className="flex gap-8 text-base font-medium text-gray-50">
           {navItems.map((item) => {
-            const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
+            let path = "/";
+            if (item === "Home") path = "/";
+            else if (item === "Dashboard") path = "/admin/dashboard";
+            else path = `/${item.toLowerCase()}`;
+
             return (
               <Link
                 key={item}
@@ -113,7 +123,10 @@ const Header = () => {
 
           {/* Nav Links */}
           {navItems.map((item) => {
-            const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
+            let path = "/";
+            if (item === "Home") path = "/";
+            else if (item === "Dashboard") path = "/admin/dashboard";
+            else path = `/${item.toLowerCase()}`;
             return (
               <Link
                 key={item}

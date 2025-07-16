@@ -13,7 +13,7 @@ import {
   FaHandsHelping,
   FaStar,
 } from "react-icons/fa";
-import EventCategoryCard from "../component/EventCategoryGrid";
+import EventCategoryCard from "../components/EventCategoryGrid";
 
 const services = [
   {

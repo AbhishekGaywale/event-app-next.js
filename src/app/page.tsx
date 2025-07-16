@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import HeroSlider from "./component/HeroSection";
+import HeroSlider from "./components/HeroSection";
 import MyStoryPage from "./mystory/page";
 import Servicepage from "./services/page";
 import HappyCustpage from "./happycustomer/page";

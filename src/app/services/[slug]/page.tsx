@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Poppins } from "next/font/google";
 import ContactUsPage from "@/app/contact/page";
 import { motion } from "framer-motion";
-import EventCard from "@/app/component/EventCard";
+import EventCard from "@/app/components/EventCard";
+import Link from "next/link";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -76,88 +77,108 @@ export default function EventDetailPage() {
   }
 
   return (
-  <section className={`${poppins.className}`}>
-  {/* Hero Section */}
-  <div className="relative w-full h-[240px] md:h-[200px]">
-    <Image
-      src="/slide/design_05.jpg"
-      alt="Hero Background"
-      fill
-      className="object-cover brightness-[0.4]"
-    />
-    <div className="absolute inset-0 flex items-center justify-center">
-      <h1 className="text-white text-4xl md:text-6xl font-bold drop-shadow-lg font-serif">
-        {event.title}
-      </h1>
-    </div>
-  </div>
-
-  {/* Detail Section - Text Left, Image Right */}
-  <div className="bg-[linear-gradient(130deg,#fffaf3,#fdf0d1,#ffffff)] py-20 px-4 sm:px-6">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-      {/* Left: Text */}
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.7 }}
-        viewport={{ once: true }}
-        className="bg-transparent backdrop-blur-md p-8 md:p-10 rounded-3xl shadow"
-      >
-        <h2 className="text-3xl md:text-4xl font-bold text-[#3b310b] mb-6">
-          What’s Included
-        </h2>
-        <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
-          {event.description}
-        </p>
-        <ul className="space-y-4 text-[#6b4e09] font-medium text-base sm:text-lg">
-          {event.features.map((feature, index) => (
-            <li key={index} className="flex items-start gap-2">
-              <span className="mt-1 text-amber-500">✓</span>
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      </motion.div>
-
-      {/* Right: Image */}
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.7 }}
-        viewport={{ once: true }}
-        className="overflow-hidden rounded-3xl shadow-2xl"
-      >
+    <section className={`${poppins.className}`}>
+      {/* Hero Section */}
+      <div className="relative w-full h-[240px] md:h-[200px]">
         <Image
-          src={event.image}
-          alt={event.title}
-          width={600}
-          height={400}
-          className="w-full h-[300px] sm:h-[420px] object-cover hover:scale-[1.03] transition-transform duration-700 ease-in-out"
+          src="/slide/design_05.jpg"
+          alt="Hero Background"
+          fill
+          className="object-cover brightness-[0.4]"
         />
-      </motion.div>
-    </div>
-  </div>
-{event.slug === "birthday" && (
-  <div className="px-4 md:px-6 py-10 bg-white">
-    <h3 className="text-2xl font-bold text-[#3b310b] mb-6">Similar Packages</h3>
-    <EventCard
-      title="Birthday Party"
-      rating="4.5"
-      description="Celebrate your kid's birthday with balloons, cake, and fun themes."
-      imageUrl="/images/theme.jpg"
-    />
-  </div>
-)}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <h1 className="text-white text-4xl md:text-6xl font-bold drop-shadow-lg font-serif">
+            {event.title}
+          </h1>
+        </div>
+      </div>
 
+      {/* Category Section (New) */}
+      <div className="bg-white py-6 px-4 md:px-12">
+        <div className="flex overflow-x-auto gap-4 scrollbar-thin scrollbar-thumb-gray-300">
+          {services.map((item) => (
+            <Link key={item.slug} href={`/events/${item.slug}`}>
+              <div
+                className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium border cursor-pointer transition
+                ${
+                  item.slug === slug
+                    ? "bg-[#facc15] text-black border-yellow-400"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {item.title}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
 
-  {/* Contact Section */}
-  <div className="bg-white py-16 px-4 md:px-6">
-    <h3 className="text-3xl font-bold text-center text-[#3b310b] mb-10">
-      Ready to Book?
-    </h3>
-    <ContactUsPage />
-  </div>
-</section>
+      {/* Detail Section */}
+      <div className="bg-[linear-gradient(130deg,#fffaf3,#fdf0d1,#ffffff)] py-20 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* Left: Text */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="bg-transparent backdrop-blur-md p-8 md:p-10 rounded-3xl shadow"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-[#3b310b] mb-6">
+              What’s Included
+            </h2>
+            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
+              {event.description}
+            </p>
+            <ul className="space-y-4 text-[#6b4e09] font-medium text-base sm:text-lg">
+              {event.features.map((feature, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="mt-1 text-amber-500">✓</span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
+          {/* Right: Image */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="overflow-hidden rounded-3xl shadow-2xl"
+          >
+            <Image
+              src={event.image}
+              alt={event.title}
+              width={600}
+              height={400}
+              className="w-full h-[300px] sm:h-[420px] object-cover hover:scale-[1.03] transition-transform duration-700 ease-in-out"
+            />
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Similar Packages */}
+      {event.slug === "birthday" && (
+        <div className="px-4 md:px-6 py-10 bg-white">
+          <h3 className="text-2xl font-bold text-[#3b310b] mb-6">Similar Packages</h3>
+          <EventCard
+            title="Birthday Party"
+            rating="4.5"
+            description="Celebrate your kid's birthday with balloons, cake, and fun themes."
+            imageUrl="/images/theme.jpg"
+          />
+        </div>
+      )}
+
+      {/* Contact Section */}
+      <div className="bg-white py-16 px-4 md:px-6">
+        <h3 className="text-3xl font-bold text-center text-[#3b310b] mb-10">
+          Ready to Book?
+        </h3>
+        <ContactUsPage />
+      </div>
+    </section>
   );
 }
