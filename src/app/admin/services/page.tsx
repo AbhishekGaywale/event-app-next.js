@@ -23,13 +23,13 @@ export default function ServicesPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Services</h1>
         <Link href="/admin/services/add">
-          <Button>Add New Event</Button>
+          <Button variant="outline">Add New Event</Button>
         </Link>
       </div>
 
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className='bg-gray-200'>
             <TableHead>ID</TableHead>
             <TableHead>Event Name</TableHead>
             <TableHead>Description</TableHead>

@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 
 const navLinks = [
   { label: 'Dashboard', href: '/admin/dashboard' },
-  { label: 'Services', href: '/admin/services' },
+  { label: 'Services/Events', href: '/admin/services' },
   { label: 'Event Category', href: '/admin/event-category' },
   { label: 'Testimonial', href: '/admin/testimonials' },
   { label: 'Settings', href: '/admin/settings' },

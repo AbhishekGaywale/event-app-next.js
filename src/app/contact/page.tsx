@@ -45,37 +45,23 @@ export default function ContactUsPage() {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const message = `Hello KB Production,
-Name: ${formData.name}
-WhatsApp: ${formData.whatsapp}
-Query For: ${formData.queryFor}
-Date: ${formData.date}
-Location: ${formData.location}`;
+  // You can later add API logic to save data to database here
+  console.log("Form submitted:", formData);
 
-    const encodedMessage = encodeURIComponent(message);
-    const phoneNumber = "917558275706";
+  // Reset form
+  setFormData({
+    name: "",
+    whatsapp: "",
+    queryFor: "",
+    date: "",
+    location: "",
+  });
 
-    // Detect mobile device
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  setOpenModel(false); // close modal if open
+};
 
-    const whatsappUrl = isMobile
-      ? `https://wa.me/${phoneNumber}?text=${encodedMessage}`
-      : `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
-
-    window.open(whatsappUrl, "_blank");
-
-    // Reset form and optionally close modal
-    setFormData({
-      name: "",
-      whatsapp: "",
-      queryFor: "",
-      date: "",
-      location: "",
-    });
-    setOpenModel(false);
-  };
 
   return (
     <>
@@ -231,7 +217,7 @@ Location: ${formData.location}`;
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.01 21l20.99-9L2.01 3v7l15 2-15 2z" />
               </svg>
-              Submit via WhatsApp
+              Submit 
             </button>
           </form>
 

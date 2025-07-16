@@ -39,8 +39,6 @@ const Header = () => {
 
   return (
     <header className="bg-[#1f2937] text-black top-0 z-50 w-full  overflow-hidden">
-      
-
       {/* Desktop Header */}
       <div className="hidden md:flex items-center justify-between px-10 py-4 max-w-7xl mx-auto">
         {/* Left: Logo */}
