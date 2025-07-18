@@ -44,22 +44,36 @@ export default function ContactUsPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  // You can later add API logic to save data to database here
-  console.log("Form submitted:", formData);
+  try {
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
 
-  // Reset form
-  setFormData({
-    name: "",
-    whatsapp: "",
-    queryFor: "",
-    date: "",
-    location: "",
-  });
-
-  setOpenModel(false); // close modal if open
+    if (res.ok) {
+      alert("Message sent successfully!");
+      setFormData({
+        name: "",
+        whatsapp: "",
+        queryFor: "",
+        date: "",
+        location: "",
+      });
+      setOpenModel(false);
+    } else {
+      const errorData = await res.json();
+      alert("Error: " + errorData.message || "Something went wrong");
+    }
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    alert("Network error or server not responding.");
+  }
 };
 
 

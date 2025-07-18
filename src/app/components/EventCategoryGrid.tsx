@@ -77,6 +77,7 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Poppins } from "next/font/google";
+import Image from "next/image"; // ✅ Add this import
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -84,10 +85,10 @@ const poppins = Poppins({
 });
 
 interface Service {
-  title: string;
+  name: string;
   slug: string;
   description: string;
-  icon: React.ReactNode;
+  icon: string;
 }
 
 export default function EventCategoryCard({
@@ -112,9 +113,26 @@ export default function EventCategoryCard({
               <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-purple-500 transition-all duration-500 group-hover:w-full group-focus:w-full" />
 
               {/* Icon */}
-              <div className="relative z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#F8E7EC] group-hover:bg-[#e5e7eb] flex items-center justify-center transition-all duration-300">
-    {service.icon}
-  </div>
+              {/* Icon */}
+              <div className="relative z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#F8E7EC] group-hover:bg-[#b0d3cf] flex items-center justify-center transition-all duration-300 overflow-hidden">
+                {service.icon ? (
+                  <Image
+                    src={service.icon}
+                    alt={service.name}
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                  />
+                ) : (
+                  <Image
+                    src="/icon/defaultimg.png"
+                    alt="default icon"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                  />
+                )}
+              </div>
 
               {/* Title */}
               <motion.h3
@@ -124,7 +142,7 @@ export default function EventCategoryCard({
                 viewport={{ once: true }}
                 className="text-xl font-semibold text-gray-800 group-hover:text-[#7c3aed] tracking-tight"
               >
-                {service.title}
+                {service.name}
               </motion.h3>
 
               {/* Description */}

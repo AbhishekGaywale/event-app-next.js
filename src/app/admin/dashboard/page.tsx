@@ -1,73 +1,93 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-interface Event {
-  id: number;
+interface Contact {
+  _id: string;
   name: string;
-  date: string; // ISO format
+  whatsapp: string;
+  queryFor: string;
+  date: string;
+  location: string;
+  createdAt: string;
 }
 
-const upcomingEvents: Event[] = [
-  { id: 1, name: 'Birthday Party – Arjun', date: '2025-07-20' },
-  { id: 2, name: 'Baby Shower – Priya', date: '2025-07-22' },
-  { id: 3, name: 'Haldi Ceremony – Raj', date: '2025-07-25' },
-];
-
-const notifications = [
-  { id: 1, message: 'New query submitted from the contact form', time: '2 mins ago' },
-  { id: 2, message: 'Service "Mehendi Decor" was edited', time: '1 hour ago' },
-  { id: 3, message: 'Proposal booking confirmed', time: 'Today' },
-];
-
 export default function DashboardPage() {
-  const today = new Date();
+  const [contactNotifs, setContactNotifs] = useState<Contact[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
-  const filteredEvents = upcomingEvents.filter((event) => {
-    const eventDate = new Date(event.date);
-    return eventDate >= today;
-  });
+  const fetchContactNotifications = async () => {
+    try {
+      const res = await fetch('/api/contact');
+      const data = await res.json();
+      setContactNotifs(data.contacts.reverse());
+    } catch (error) {
+      console.error("Failed to fetch contacts", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchContactNotifications();
+    const interval = setInterval(fetchContactNotifications, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl text-black font-bold">Dashboard</h1>
-      <p className="text-black">Welcome to the admin panel dashboard.</p>
+    <div className=" sm:p-8 space-y-10">
+      <p className="text-lg text-muted-foreground">Welcome! Here are your latest updates.</p>
 
-      {/* Notifications Section */}
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold text-black mb-4">Notifications</h2>
-        {notifications.length > 0 ? (
-          <ul className="space-y-3">
-            {notifications.map((note) => (
-              <li key={note.id} className="border-l-4 border-blue-500 bg-blue-50 p-3 rounded">
-                <p className="text-blue-900">{note.message}</p>
-                <p className="text-sm text-blue-700">{note.time}</p>
+      <Card className="p-6 shadow-xl">
+        <h2 className="text-2xl font-semibold mb-4 text-green-800"> Recent Contact Queries</h2>
+
+        {contactNotifs.length > 0 ? (
+          <ul className="space-y-4">
+            {contactNotifs.slice(0, 5).map((c) => (
+              <li key={c._id} className="border-l-4 border-green-500 bg-green-50 rounded p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-green-900">
+                      <span className="font-semibold">{c.name}</span> queried for <strong>{c.queryFor}</strong>
+                    </p>
+                    <p className="text-sm text-green-700">📅 {new Date(c.createdAt).toLocaleString()}</p>
+                  </div>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedContact(c)}
+                        className="text-green-700 border-green-600 hover:bg-green-100"
+                      >
+                        View
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="text-green-800">Contact Details</DialogTitle>
+                      </DialogHeader>
+                      {selectedContact && (
+                        <div className="space-y-2 text-sm text-gray-800">
+                          <p><strong>Name:</strong> {selectedContact.name}</p>
+                          <p><strong>WhatsApp:</strong> {selectedContact.whatsapp}</p>
+                          <p><strong>Query For:</strong> {selectedContact.queryFor}</p>
+                          <p><strong>Event Date:</strong> {selectedContact.date}</p>
+                          <p><strong>Location:</strong> {selectedContact.location}</p>
+                          <p><strong>Submitted At:</strong> {new Date(selectedContact.createdAt).toLocaleString()}</p>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500">No notifications</p>
+          <p className="text-gray-600">No contact form notifications yet.</p>
         )}
-      </div>
-
-      {/* Upcoming Events Section */}
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold text-black mb-4">Upcoming Events</h2>
-        {filteredEvents.length > 0 ? (
-          <ul className="space-y-2">
-            {filteredEvents.map((event) => (
-              <li
-                key={event.id}
-                className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-4 rounded shadow-sm"
-              >
-                <strong>{event.name}</strong> – {new Date(event.date).toDateString()}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-600">No upcoming events.</p>
-        )}
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,11 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 import Sidebar from './componant/Sidebar';
 import { Menu } from 'lucide-react';
+// import LoadingSpinner from './LoadingSpinner';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, isAdmin } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if 
+     (user && !isAdmin()) {
+      // Logged in but not admin, redirect to unauthorized
+      router.push('/unauthorized');
+    }
+  }, [user, isAdmin, router]);
+
+  // Show loading while checking auth status
+  // if (!user || !isAdmin()) {
+  //   return <LoadingSpinner />;
+  // }
 
   return (
     <div className="flex min-h-screen">
@@ -19,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-gray-700"
+            aria-label="Open sidebar"
           >
             <Menu size={28} />
           </button>
