@@ -1,6 +1,5 @@
 // models/eventCategoryModel.ts
-import { number } from "framer-motion";
-import mongoose, { Schema, models, model } from "mongoose";
+import  { Schema, models, model } from "mongoose";
 
 const eventCategorySchema = new Schema(
   {

@@ -46,7 +46,7 @@ export default function AboutPage() {
             {/* CTA Button */}
             <div>
               <button className="mt-2 inline-block px-6 py-3 rounded-full bg-sky-100 text-sky-900 font-medium shadow hover:bg-[#5c798b] transition duration-300">
-                Let's Plan Together
+                Lets Plan Together
               </button>
             </div>
           </div>

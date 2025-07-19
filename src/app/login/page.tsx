@@ -24,13 +24,14 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (res.ok) {
-        login(data.user); // ⬅️ Save user in context
+        login(data.user);
         router.push('/admin/dashboard');
       } else {
         setError(data.message || 'Login failed');
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');
+      console.error('Login error:', err);
     }
   };
 
@@ -62,7 +63,9 @@ export default function LoginPage() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <Button type="submit" className="w-full bg-sky-200">Sign In</Button>
+          <Button type="submit" className="w-full bg-sky-200">
+            Sign In
+          </Button>
         </form>
       </div>
     </div>

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import HeroSlider from "./components/HeroSection";
-import MyStoryPage from "./mystory/page";
 import Servicepage from "./services/page";
 import HappyCustpage from "./happycustomer/page";
 import Testimonialpage from "./testimonials/page";
@@ -12,15 +11,15 @@ import ContactPage from "./contact/page";
 export default function Page() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  // const [showScrollTop, setShowScrollTop] = useState(false);
 
-useEffect(() => {
-  const handleScroll = () => {
-    setShowScrollTop(window.scrollY > 300);
-  };
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+// useEffect(() => {
+//   const handleScroll = () => {
+//     setShowScrollTop(window.scrollY > 300);
+//   };
+//   window.addEventListener("scroll", handleScroll);
+//   return () => window.removeEventListener("scroll", handleScroll);
+// }, []);
   return (
     // <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-[#FFF5F7] via-[#F4F7FF] to-[#FBF3E3]">
     <div className="relative min-h-screen overflow-x-hidden bg-white">

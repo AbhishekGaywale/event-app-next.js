@@ -10,8 +10,12 @@ export async function POST(req: Request) {
   try {
     const contact = await Contact.create(body);
     return NextResponse.json({ message: "Submitted", contact }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ message: "Error saving contact" }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("Error saving contact:", error);
+    return NextResponse.json(
+      { message: "Error saving contact", error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -22,7 +26,11 @@ export async function GET() {
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 });
     return NextResponse.json({ contacts }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ message: "Error fetching contacts" }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("Error fetching contacts:", error);
+    return NextResponse.json(
+      { message: "Error fetching contacts", error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }

@@ -30,6 +30,7 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import axios from "axios";
 import { processImageData } from "@/lib/processImage";
+import Image from "next/image";
 
 interface EventCategory {
   _id?: string;
@@ -53,7 +54,7 @@ export default function EventCategoryPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [eventOptions, setEventOptions] = useState<string[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | undefined>(undefined);
+  const [deleteId, setDeleteId] = useState<string | undefined>();
 
   useEffect(() => {
     fetchEvents();
@@ -62,51 +63,66 @@ export default function EventCategoryPage() {
 
   const fetchEvents = async () => {
     const res = await axios.get("/api/events");
-    const data = res.data;
-    const names = data.map((event: any) => event.name);
+    const data = res?.data;
+    const names = data.map((event: { name: string }) => event.name);
     setEventOptions(names);
   };
 
   const fetchEventCategory = async () => {
+  try {
     const res = await fetch("/api/event-category");
     const data = await res.json();
-    setCategories(data);
-  };
-
- const handleSave = async () => {
-  const icon = await processImageData(form.image);
-
-  const payload = {
-    ...form,
-    image: icon,
-  };
-
-  if (editingId) {
-    await fetch(`/api/event-category/${editingId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  } else {
-    await fetch("/api/event-category", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    console.log("Fetched event categories:", data); // ← log the response
+    if (Array.isArray(data)) {
+      setCategories(data);
+    } else {
+      console.error("Expected array but got:", data);
+      setCategories([]); // fallback to empty array to avoid crash
+    }
+  } catch (err) {
+    console.error("Error fetching event categories", err);
+    setCategories([]);
   }
-
-  setForm({
-    eventName: "",
-    categoryName: "",
-    description: "",
-    image: "",
-    price: "",
-  });
-  setEditingId(null);
-  setOpen(false);
-  fetchEventCategory();
 };
 
+
+  const handleSave = async () => {
+    const icon = await processImageData(form.image);
+
+    const payload = {
+      ...form,
+      image: icon,
+    };
+
+    try {
+      if (editingId) {
+        await fetch(`/api/event-category/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await fetch("/api/event-category", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      setForm({
+        eventName: "",
+        categoryName: "",
+        description: "",
+        image: "",
+        price: "",
+      });
+      setEditingId(null);
+      setOpen(false);
+      fetchEventCategory();
+    } catch (error) {
+      console.error("Error saving category", error);
+    }
+  };
 
   const handleEdit = (item: EventCategory) => {
     setForm(item);
@@ -121,7 +137,7 @@ export default function EventCategoryPage() {
         method: "DELETE",
       });
       setDeleteOpen(false);
-      fetchEventCategory(); // refresh the list
+      fetchEventCategory();
     } catch (error) {
       console.error("Error deleting category", error);
     }
@@ -147,7 +163,7 @@ export default function EventCategoryPage() {
                 <Label>Event Name</Label>
                 <Select
                   value={form.eventName}
-                  onValueChange={(value) =>
+                  onValueChange={(value: string) =>
                     setForm({ ...form, eventName: value })
                   }
                 >
@@ -163,23 +179,21 @@ export default function EventCategoryPage() {
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <Label>Category</Label>
                 <Input
                   value={form.categoryName}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setForm({ ...form, categoryName: e.target.value })
                   }
                   placeholder="Enter category"
                 />
               </div>
-
               <div>
                 <Label>Description</Label>
                 <textarea
                   value={form.description}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     setForm({ ...form, description: e.target.value })
                   }
                   placeholder="Enter description"
@@ -187,13 +201,12 @@ export default function EventCategoryPage() {
                   className="w-full border rounded-md px-3 py-2"
                 />
               </div>
-
               <div>
                 <Label>Image</Label>
                 <Input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const file = e.target.files?.[0];
                     if (file) {
                       const imageUrl = URL.createObjectURL(file);
@@ -202,20 +215,26 @@ export default function EventCategoryPage() {
                   }}
                 />
                 {form.image && (
-                  <img
-                    src={form.image}
-                    alt="Preview"
-                    className="w-20 h-20 object-cover mt-2 border rounded"
-                  />
+                  <div className="w-20 h-20 mt-2 border rounded overflow-hidden">
+                    <Image
+                      src={form.image}
+                      alt="Preview"
+                      width={80}
+                      height={80}
+                      className="object-cover w-full h-full"
+                      unoptimized={true}
+                    />
+                  </div>
                 )}
               </div>
-
               <div>
                 <Label>Price</Label>
                 <Input
                   type="number"
                   value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setForm({ ...form, price: e.target.value })
+                  }
                   placeholder="Enter price"
                 />
               </div>
@@ -229,7 +248,7 @@ export default function EventCategoryPage() {
           </DialogContent>
         </Dialog>
       </div>
-      {/* delete model */}
+
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
@@ -247,7 +266,6 @@ export default function EventCategoryPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
@@ -272,11 +290,16 @@ export default function EventCategoryPage() {
                 </TableCell>
                 <TableCell>
                   {item.image && (
-                    <img
-                      src={item.image}
-                      alt="icon"
-                      className="w-10 h-10 rounded object-cover"
-                    />
+                    <div className="w-10 h-10 rounded overflow-hidden">
+                      <Image
+                        src={item.image}
+                        alt="icon"
+                        width={40}
+                        height={40}
+                        className="object-cover w-full h-full"
+                        unoptimized={true}
+                      />
+                    </div>
                   )}
                 </TableCell>
                 <TableCell>₹{item.price}</TableCell>
@@ -301,7 +324,6 @@ export default function EventCategoryPage() {
         </Table>
       </div>
 
-      {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {categories.map((item, index) => (
           <div
@@ -311,11 +333,16 @@ export default function EventCategoryPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">{item.categoryName}</h2>
               {item.image && (
-                <img
-                  src={item.image}
-                  alt="icon"
-                  className="w-12 h-12 object-cover rounded"
-                />
+                <div className="w-12 h-12 rounded overflow-hidden">
+                  <Image
+                    src={item.image}
+                    alt="icon"
+                    width={48}
+                    height={48}
+                    className="object-cover w-full h-full"
+                    unoptimized={true}
+                  />
+                </div>
               )}
             </div>
             <p className="text-sm text-gray-600 whitespace-pre-wrap">

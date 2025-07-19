@@ -21,8 +21,8 @@ export default function EventDetailPage() {
             Elegant Birthday Celebration
           </h1>
           <p className=" text-[#bd9f28] text-lg leading-relaxed mb-6">
-            Celebrate your loved one's special day with vibrant balloon décor,
-            themed setups, and unforgettable ambiance. From kids' parties to
+            Celebrate your loved ones special day with vibrant balloon décor,
+            themed setups, and unforgettable ambiance. From kids parties to
             milestone birthdays, we craft every detail with joy.
           </p>
           <ul className="list-disc list-inside text-[#bd9f28] space-y-2">

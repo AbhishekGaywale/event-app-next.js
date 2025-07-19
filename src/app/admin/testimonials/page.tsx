@@ -152,7 +152,7 @@ export default function TestimonialsAdminPage() {
               <video
                 src={t.videoUrl}
                 controls
-                className="w-full h-48 object-cover rounded mb-2"
+                className="w-full h-48 object-fit rounded mb-2"
               />
               <div className="flex gap-2">
                 <Button

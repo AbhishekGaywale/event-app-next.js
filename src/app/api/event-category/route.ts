@@ -1,27 +1,26 @@
-// app/api/events/route.ts
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { EventCategory } from "@/models/eventCategoryModel";
 
+// GET /api/event-category
 export async function GET() {
+  await connectDB();
   try {
-    await connectDB();
-    const eventCategory = await EventCategory.find();
-    return NextResponse.json(eventCategory);
-  } catch (error) {
-    console.error("GET /api/event-category error:", error);
-    return new NextResponse("Server Error", { status: 500 });
+    const categories = await EventCategory.find();
+    return NextResponse.json(categories);
+  } catch (_) {
+    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }
 
+// POST /api/event-category
 export async function POST(req: Request) {
+  await connectDB();
   try {
-    await connectDB();
     const body = await req.json();
-    const newEvent = await EventCategory.create(body);
-    return NextResponse.json(newEvent);
-  } catch (error) {
-    console.error("POST /api/events-category error:", error);
-    return new NextResponse("Server Error", { status: 500 });
+    const newCategory = await EventCategory.create(body);
+    return NextResponse.json(newCategory, { status: 201 });
+  } catch (_) {
+    return NextResponse.json({ error: "Create failed" }, { status: 500 });
   }
 }

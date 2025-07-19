@@ -6,9 +6,6 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "100mb", // Increase limit as needed
     },
   },
-  api: {
-    bodyParser: false, // Required for file uploads (FormData)
-  },
   
 };
 

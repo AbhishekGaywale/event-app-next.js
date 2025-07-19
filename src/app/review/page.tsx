@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function ReviewPage() {
   return (
     <div className="flex flex-col items-center px-4 py-12  bg-gray-50">
-      <h1 className="text-3xl font-bold text-indigo-700 mb-10">OUR CLIENT'S REVIEW</h1>
+      <h1 className="text-3xl font-bold text-indigo-700 mb-10">OUR CLIENTS REVIEW</h1>
 
       <div className="bg-blue-300 text-white max-w-2xl w-full rounded-md shadow-md p-6 relative">
         {/* Quotation Icon (top right) */}

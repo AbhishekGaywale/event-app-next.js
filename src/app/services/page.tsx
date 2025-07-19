@@ -3,17 +3,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  FaBriefcase,
-  FaBirthdayCake,
-  FaBaby,
-  FaRing,
-  FaHome,
-  FaBuilding,
-  FaHandsHelping,
-  FaStar,
-} from "react-icons/fa";
-import EventCategoryCard from "../components/EventCategoryGrid";
+
+import EventCategoryCard from "../components/EventCard";
 import axios from "axios";
 
 // const services = [
@@ -202,11 +193,19 @@ import axios from "axios";
 //     icon: <FaStar className="text-7xl sm:text-8xl mx-auto text-yellow-500" />,
 //   },
 // ];
-
-export default function Servicepage() {
-  const [services, setServices] = useState([]);
-
+// Define matching interface in this file
+interface Service {
+  _id: string;
+  name: string;
+  description: string;
+  icon: string;
+  slug: string; // Make sure to include slug here too
+  price?: number;
+}
+export default function ServicePage() {
+  const [services, setServices] = useState<Service[]>([]);
   const [showAll, setShowAll] = useState(false);
+
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -219,21 +218,23 @@ export default function Servicepage() {
 
     fetchServices();
   }, []);
-  const visibleServices = showAll ? services : services.slice(0, 8);
+
+
+ 
 
   return (
     <section className="bg-white py-10 px-2 ">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl text-center sm:text-3xl font-serif font text text-[#51A4A8] mb-7 tracking-tight">
+        <h2 className="text-2xl text-center sm:text-3xl font-serif text-[#51A4A8] mb-7 tracking-tight">
           — Our Event Services
         </h2>
-        <p className=" text-gray-700 text-2xl max-w-2xl text-center  font-serif mx-auto mb-12">
-          Whether it’s a birthday, wedding, baby shower, or corporate event, we
+        <p className="text-gray-700 text-2xl max-w-2xl text-center font-serif mx-auto mb-12">
+          Whether its a birthday, wedding, baby shower, or corporate event, we
           create unforgettable experiences tailored to your vision.
         </p>
-        <EventCategoryCard services={visibleServices} />
+        
+        <EventCategoryCard services={services} />
 
-        {/* Toggle Button */}
         {services.length > 8 && (
           <div className="text-center mt-10">
             <button
