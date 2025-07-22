@@ -106,7 +106,7 @@ export default function TestimonialsAdminPage() {
         <h1 className="text-2xl font-bold">Video Testimonials</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => resetForm()}>Add Testimonial</Button>
+            <Button className="text-white bg-indigo-600" onClick={() => resetForm()}>Add Testimonial</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>

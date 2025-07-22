@@ -152,7 +152,7 @@ export default function EventCategoryCard({
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="text-sm text-gray-600 leading-relaxed"
+                className="text-sm text-gray-600 leading-relaxed  line-clamp-3"
               >
                 {service.description}
               </motion.p>

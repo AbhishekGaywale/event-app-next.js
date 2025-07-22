@@ -5,13 +5,19 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import EventCategoryCard from "@/app/components/EventCategoryCard";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 interface Service {
   _id: string;
   name: string;
   description: string;
-  images: string[]; // Changed to array of images
+  images: string[];
   highlights?: string[];
+  
 }
 
 interface EventCategory {
@@ -19,28 +25,41 @@ interface EventCategory {
   eventName: string;
   categoryName: string;
   description: string;
-  image: string;
+  images: string[];
+  price:number;
 }
 
 export default function ServiceDetailPage() {
-  const params = useParams();
+const params = useParams<{ id: string }>();
   const router = useRouter();
   const [service, setService] = useState<Service | null>(null);
   const [categories, setCategories] = useState<EventCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // const [isMobile, setIsMobile] = useState(false);
+
+  // useEffect(() => {
+  //   const checkMobile = () => {
+  //     setIsMobile(window.innerWidth < 768);
+  //   };
+    
+  //   checkMobile();
+  //   window.addEventListener('resize', checkMobile);
+  //   return () => window.removeEventListener('resize', checkMobile);
+  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch service details
         const serviceRes = await axios.get(`/api/events/${params.id}`);
+        const serviceData = serviceRes.data;
+
         setService({
-          ...serviceRes.data,
-          images: Array.isArray(serviceRes.data.images)
-            ? serviceRes.data.images
-            : [serviceRes.data.images || "/default-service.jpg"],
-          highlights: serviceRes.data.highlights || [
+          ...serviceData,
+          images: Array.isArray(serviceData.images)
+            ? serviceData.images
+            : [serviceData.images || "/default-service.jpg"],
+          highlights: serviceData.highlights || [
             "Custom decoration design",
             "Professional setup",
             "Quality materials",
@@ -48,11 +67,19 @@ export default function ServiceDetailPage() {
           ],
         });
 
-        // Fetch event categories
-        const categoriesRes = await axios.get("/api/event-category");
-        setCategories(
-          Array.isArray(categoriesRes.data) ? categoriesRes.data : []
+        // Fetch categories filtered by event name
+        const categoriesRes = await axios.get(
+          `/api/event-category?eventName=${serviceData.name}`
         );
+        const processedCategories = Array.isArray(categoriesRes.data)
+          ? categoriesRes.data.map((cat: EventCategory) => ({
+              ...cat,
+              images: Array.isArray(cat.images) 
+                ? cat.images 
+                : [cat.images || "/default-category.jpg"]
+            }))
+          : [];
+        setCategories(processedCategories);
       } catch (error) {
         console.error("Error fetching data", error);
         router.push("/services");
@@ -93,18 +120,18 @@ export default function ServiceDetailPage() {
   return (
     <section className="bg-white">
       {/* Hero Section */}
-      <div className="relative h-96 w-full ">
+      <div className="relative h-48 md:h-64 w-full">
         <Image
-          src="/slide/design_05.jpg" // Added leading slash for absolute path
+          src="/slide/design_05.jpg"
           alt={service.name}
           fill
           className="object-cover"
           priority
-          sizes="100vw" // Added for better performance
+          sizes="100vw"
         />
-        <div className="absolute inset-0   bg-opacity-30 flex items-center justify-center">
+        <div className="absolute inset-0 bg-opacity-30 flex items-center justify-center">
           <div className="text-center px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-serif tracking-wide">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-serif tracking-wide">
               {service.name}
             </h1>
             <div className="w-20 h-1 bg-[#51A4A8] mx-auto mb-6"></div>
@@ -113,40 +140,34 @@ export default function ServiceDetailPage() {
       </div>
 
       {/* Service Details */}
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="flex flex-col lg:flex-row gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+        <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
           {/* Image Gallery */}
           <div className="lg:w-1/2">
-            <div className="relative h-96 rounded-xl overflow-hidden shadow-lg mb-4">
-              <Image
-                src={service.images[currentImageIndex]}
-                alt={service.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            {service.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+            <div className="relative h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden shadow-lg mb-4">
+              <Swiper
+                modules={[Navigation, Pagination, Autoplay]}
+                navigation
+                pagination={{ clickable: true }}
+                autoplay={{ delay: 5000 }}
+                loop
+                className="h-full w-full"
+              >
                 {service.images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`relative h-24 rounded-md overflow-hidden transition-all ${
-                      currentImageIndex === index
-                        ? "ring-4 ring-[#51A4A8]"
-                        : "opacity-80 hover:opacity-100"
-                    }`}
-                  >
-                    <Image
-                      src={img}
-                      alt={`${service.name} thumbnail ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
+                  <SwiperSlide key={index}>
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={img}
+                        alt={`${service.name} ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                      />
+                    </div>
+                  </SwiperSlide>
                 ))}
-              </div>
-            )}
+              </Swiper>
+            </div>
           </div>
 
           {/* Service Content */}
@@ -158,23 +179,23 @@ export default function ServiceDetailPage() {
               ← Back to Services
             </button>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 font-serif">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 font-serif">
               About This Service
             </h2>
 
-            <p className="text-gray-600 mb-8 leading-relaxed">
+            <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed">
               {service.description}
             </p>
 
-            <div className="mb-10">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 font-serif">
+            <div className="mb-8 md:mb-10">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-3 md:mb-4 font-serif">
                 Service Highlights
               </h3>
-              <ul className="space-y-3">
+              <ul className="space-y-2 md:space-y-3">
                 {service.highlights?.map((highlight, index) => (
                   <li key={index} className="flex items-start">
                     <svg
-                      className="h-5 w-5 text-[#51A4A8] mt-1 mr-3 flex-shrink-0"
+                      className="h-5 w-5 text-[#51A4A8] mt-0.5 mr-2 md:mr-3 flex-shrink-0"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -186,28 +207,30 @@ export default function ServiceDetailPage() {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    <span className="text-gray-700">{highlight}</span>
+                    <span className="text-gray-700 text-sm md:text-base">
+                      {highlight}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <button className="bg-[#51A4A8] hover:bg-[#3e8a8e] text-white px-8 py-3 rounded-lg font-medium text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <button className="w-full md:w-auto bg-[#51A4A8] hover:bg-[#3e8a8e] text-white px-6 py-3 md:px-8 md:py-3 rounded-lg font-medium text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
               Book This Service
             </button>
           </div>
         </div>
 
         {/* Related Event Categories */}
-        <div className="mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif text-gray-800 mb-3">
+        <div className="mt-16 md:mt-20">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-serif text-gray-800 mb-3">
               Perfect For These Events
             </h2>
             <div className="w-20 h-1 bg-[#51A4A8] mx-auto"></div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
             {categories.map((category) => (
               <EventCategoryCard
                 key={category._id}
@@ -215,7 +238,8 @@ export default function ServiceDetailPage() {
                 eventName={category.eventName}
                 categoryName={category.categoryName}
                 description={category.description}
-                image={category.image}
+                price={category.price}
+                images={category.images}
               />
             ))}
           </div>

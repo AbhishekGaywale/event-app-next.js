@@ -19,7 +19,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-import {  Pencil, Trash2, UserPlus } from "lucide-react";
+import { Pencil, Trash2, UserPlus } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -106,7 +106,7 @@ export default function UserPage() {
           <CardTitle className="text-xl md:text-2xl">User Management</CardTitle>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full md:w-auto">
+              <Button className="w-full md:w-auto text-white bg-indigo-600">
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add User
               </Button>
@@ -163,32 +163,48 @@ export default function UserPage() {
         </CardHeader>
 
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
+          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-gradient-to-br from-white via-gray-50 to-white">
+            <Table className="min-w-full text-sm text-gray-800">
+              <TableHeader className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200">
                 <TableRow>
-                  <TableHead className="w-[200px]">Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="hidden md:table-cell">Role</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="px-4 py-3 w-[200px] text-indigo-600 font-semibold">
+                    Name
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-indigo-600 font-semibold">
+                    Email
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-indigo-600 font-semibold hidden md:table-cell">
+                    Role
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-right text-indigo-600 font-semibold">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
                 {users.map((user) => (
-                  <TableRow key={user._id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                  <TableRow
+                    key={user._id}
+                    className="hover:bg-gray-100/70 transition-all duration-200 border-b border-gray-100"
+                  >
+                    <TableCell className="px-4 py-3 font-medium text-gray-700">
+                      {user.name}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-600">
+                      {user.email}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 hidden md:table-cell">
                       <Badge
                         variant={
                           user.role === "admin" ? "default" : "secondary"
                         }
-                        className="capitalize"
+                        className="capitalize px-2 py-1 text-xs"
                       >
                         {user.role}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
                         {/* Edit Button */}
                         <Button
@@ -198,10 +214,10 @@ export default function UserPage() {
                             setEditingUser(user);
                             setEditOpen(true);
                           }}
-                          className="h-8 w-8 hover:bg-gray-100"
+                          className="h-8 w-8 hover:bg-indigo-50 transition-all"
                           aria-label="Edit user"
                         >
-                          <Pencil className="h-4 w-4 text-gray-600" />
+                          <Pencil className="h-4 w-4 text-indigo-600" />
                         </Button>
 
                         {/* Delete Button */}
@@ -209,7 +225,7 @@ export default function UserPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDeleteUser(user._id)}
-                          className="h-8 w-8 hover:bg-red-50"
+                          className="h-8 w-8 hover:bg-red-50 transition-all"
                           aria-label="Delete user"
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -29,16 +29,20 @@ import {
 } from "@/components/ui/select";
 import { Pencil, Trash2 } from "lucide-react";
 import axios from "axios";
-import { processImageData } from "@/lib/processImage";
 import Image from "next/image";
-
+import { processImageData } from "@/lib/processImage";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 interface EventCategory {
   _id?: string;
   eventName: string;
   categoryName: string;
   description: string;
-  image: string;
-  price: string;
+  images: string[];
+  price: number;
 }
 
 export default function EventCategoryPage() {
@@ -48,81 +52,100 @@ export default function EventCategoryPage() {
     eventName: "",
     categoryName: "",
     description: "",
-    image: "",
-    price: "",
+    images: [],
+    price: 0,
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [eventOptions, setEventOptions] = useState<string[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | undefined>();
+  const [openImageDialog, setOpenImageDialog] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleImageClick = () => imageInputRef.current?.click();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const imageUrls = Array.from(files).map((file) =>
+      URL.createObjectURL(file)
+    );
+    setForm((prev) => ({ ...prev, images: [...prev.images, ...imageUrls] }));
+  };
+
+  const removeImage = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
 
   useEffect(() => {
     fetchEvents();
-    fetchEventCategory();
+    fetchEventCategories();
   }, []);
 
   const fetchEvents = async () => {
     const res = await axios.get("/api/events");
-    const data = res?.data;
-    const names = data.map((event: { name: string }) => event.name);
+    const names = res.data.map((event: { name: string }) => event.name);
     setEventOptions(names);
   };
 
-  const fetchEventCategory = async () => {
-  try {
-    const res = await fetch("/api/event-category");
-    const data = await res.json();
-    console.log("Fetched event categories:", data); // ← log the response
-    if (Array.isArray(data)) {
-      setCategories(data);
-    } else {
-      console.error("Expected array but got:", data);
-      setCategories([]); // fallback to empty array to avoid crash
+  const fetchEventCategories = async () => {
+    setLoading(true); // Start loading
+    try {
+      const res = await axios.get("/api/event-category");
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Error fetching categories", err);
+    } finally {
+      setLoading(false); // Stop loading
     }
+  };
+
+  const handleSave = async () => {
+  if (isSaving) return; // prevent double clicks
+  setIsSaving(true);
+
+  try {
+    const processedImages = await Promise.all(
+      form.images.map((img) =>
+        img.startsWith("data:image") || !img.startsWith("blob:")
+          ? img
+          : processImageData(img)
+      )
+    );
+
+    const payload = { ...form, images: processedImages };
+
+    if (editingId) {
+      await axios.put(`/api/event-category/${editingId}`, payload);
+    } else {
+      await axios.post("/api/event-category", payload);
+    }
+
+    // Reset form and state
+    setForm({
+      eventName: "",
+      categoryName: "",
+      description: "",
+      images: [],
+      price: 0,
+    });
+    setEditingId(null);
+    setOpen(false);
+    fetchEventCategories();
   } catch (err) {
-    console.error("Error fetching event categories", err);
-    setCategories([]);
+    console.error("Error saving category", err);
+  } finally {
+    setIsSaving(false); // Optional: or remove this line to keep it disabled
   }
 };
 
-
-  const handleSave = async () => {
-    const icon = await processImageData(form.image);
-
-    const payload = {
-      ...form,
-      image: icon,
-    };
-
-    try {
-      if (editingId) {
-        await fetch(`/api/event-category/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        await fetch("/api/event-category", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      setForm({
-        eventName: "",
-        categoryName: "",
-        description: "",
-        image: "",
-        price: "",
-      });
-      setEditingId(null);
-      setOpen(false);
-      fetchEventCategory();
-    } catch (error) {
-      console.error("Error saving category", error);
-    }
-  };
 
   const handleEdit = (item: EventCategory) => {
     setForm(item);
@@ -133,23 +156,23 @@ export default function EventCategoryPage() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await fetch(`/api/event-category/${deleteId}`, {
-        method: "DELETE",
-      });
+      await axios.delete(`/api/event-category/${deleteId}`);
       setDeleteOpen(false);
-      fetchEventCategory();
-    } catch (error) {
-      console.error("Error deleting category", error);
+      fetchEventCategories();
+    } catch (err) {
+      console.error("Error deleting", err);
     }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Event Categories</h1>
+        <h1 className="text-[17px] md:text-2xl font-semibold">
+          Event Categories
+        </h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Add New</Button>
+            <Button className="text-white bg-indigo-600">Add New</Button>
           </DialogTrigger>
           <DialogContent className="max-w-md w-full max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -160,7 +183,9 @@ export default function EventCategoryPage() {
 
             <div className="space-y-4">
               <div>
-                <Label>Event Name</Label>
+                <Label>
+                  Event Name<span className="text-red-500">*</span>
+                </Label>{" "}
                 <Select
                   value={form.eventName}
                   onValueChange={(value: string) =>
@@ -180,7 +205,9 @@ export default function EventCategoryPage() {
                 </Select>
               </div>
               <div>
-                <Label>Category</Label>
+                <Label>
+                  Category<span className="text-red-500">*</span>
+                </Label>{" "}
                 <Input
                   value={form.categoryName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -201,39 +228,58 @@ export default function EventCategoryPage() {
                   className="w-full border rounded-md px-3 py-2"
                 />
               </div>
-              <div>
-                <Label>Image</Label>
+              <div className="space-y-1">
+                <Label>Images</Label>
                 <Input
+                  ref={imageInputRef}
                   type="file"
                   accept="image/*"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const imageUrl = URL.createObjectURL(file);
-                      setForm({ ...form, image: imageUrl });
-                    }
-                  }}
+                  multiple
+                  onChange={handleImageChange}
+                  className="hidden"
                 />
-                {form.image && (
-                  <div className="w-20 h-20 mt-2 border rounded overflow-hidden">
-                    <Image
-                      src={form.image}
-                      alt="Preview"
-                      width={80}
-                      height={80}
-                      className="object-cover w-full h-full"
-                      unoptimized={true}
-                    />
+
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.images?.map((img, index) => (
+                    <div key={index} className="relative">
+                      <div className="w-16 h-16 rounded border overflow-hidden">
+                        <Image
+                          src={img}
+                          alt={`Preview ${index}`}
+                          width={64}
+                          height={64}
+                          className="object-cover w-full h-full"
+                          unoptimized
+                        />
+                      </div>
+                      <button
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeImage(index);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+
+                  <div
+                    className="w-16 h-16 rounded border flex items-center justify-center bg-gray-100 cursor-pointer"
+                    onClick={handleImageClick}
+                  >
+                    <span className="text-gray-400 text-lg">+</span>
                   </div>
-                )}
+                </div>
               </div>
+
               <div>
                 <Label>Price</Label>
                 <Input
                   type="number"
                   value={form.price}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setForm({ ...form, price: e.target.value })
+                    setForm({ ...form, price: Number(e.target.value) })
                   }
                   placeholder="Enter price"
                 />
@@ -241,8 +287,12 @@ export default function EventCategoryPage() {
             </div>
 
             <DialogFooter className="mt-4">
-              <Button className="w-full" onClick={handleSave}>
-                Save
+              <Button
+                className="w-full"
+                onClick={handleSave}
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving..." : "Save"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -266,51 +316,73 @@ export default function EventCategoryPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="hidden md:block overflow-x-auto">
-        <Table>
-          <TableHeader>
+      <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-gradient-to-br from-white via-gray-50 to-white">
+        <Table className="min-w-full text-sm text-gray-800">
+          <TableHeader className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200">
             <TableRow>
-              <TableHead>Sr No</TableHead>
-              <TableHead>Event</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Image</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="px-4 py-3 text-left text-indigo-600 font-semibold">
+                Sr No
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left text-indigo-600 font-semibold">
+                Event
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left text-indigo-600 font-semibold">
+                Category
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left text-indigo-600 font-semibold">
+                Description
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left text-indigo-600 font-semibold">
+                Image
+              </TableHead>
+              <TableHead className="px-4 py-3 text-left text-indigo-600 font-semibold">
+                Price
+              </TableHead>
+              <TableHead className="px-4 py-3 text-right text-indigo-600 font-semibold">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {categories.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{item.eventName}</TableCell>
-                <TableCell>{item.categoryName}</TableCell>
-                <TableCell className="max-w-xs whitespace-pre-wrap">
+              <TableRow
+                key={index}
+                className="hover:bg-gray-100/70 transition-all duration-200 border-b border-gray-100"
+              >
+                <TableCell className="px-4 py-3 font-medium text-gray-700">
+                  {index + 1}
+                </TableCell>
+                <TableCell className="px-4 py-3 font-semibold">
+                  {item.eventName}
+                </TableCell>
+                <TableCell className="px-4 py-3">{item.categoryName}</TableCell>
+                <TableCell className="px-4 py-3 max-w-sm text-gray-600 whitespace-pre-wrap break-words">
                   {item.description}
                 </TableCell>
-                <TableCell>
-                  {item.image && (
-                    <div className="w-10 h-10 rounded overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt="icon"
-                        width={40}
-                        height={40}
-                        className="object-cover w-full h-full"
-                        unoptimized={true}
-                      />
-                    </div>
-                  )}
+                <TableCell className="px-4 py-3">
+                  <Button
+                    variant="outline"
+                    className="text-xs"
+                    onClick={() => {
+                      setSelectedImages(item.images || []);
+                      setOpenImageDialog(true);
+                    }}
+                  >
+                    View
+                  </Button>
                 </TableCell>
-                <TableCell>₹{item.price}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
+
+                <TableCell className="px-4 py-3 font-semibold text-gray-800">
+                  ₹{item.price}
+                </TableCell>
+                <TableCell className="px-4 py-3">
+                  <div className="flex gap-3 justify-end">
                     <Pencil
-                      className="w-4 h-4 text-blue-600 cursor-pointer"
+                      className="w-4 h-4 text-indigo-600 cursor-pointer hover:scale-110 transition-transform"
                       onClick={() => handleEdit(item)}
                     />
                     <Trash2
-                      className="w-4 h-4 text-red-600 cursor-pointer"
+                      className="w-4 h-4 text-red-600 cursor-pointer hover:scale-110 transition-transform"
                       onClick={() => {
                         setDeleteId(item._id);
                         setDeleteOpen(true);
@@ -323,61 +395,102 @@ export default function EventCategoryPage() {
           </TableBody>
         </Table>
       </div>
+      {/* images diolog */}
+      <Dialog open={openImageDialog} onOpenChange={setOpenImageDialog}>
+        <DialogContent className="max-w-[95vw] w-full max-h-[95vh] p-0 bg-gray-50 rounded-lg overflow-hidden">
+          <DialogHeader className="px-4 pt-4">
+            <DialogTitle className="text-indigo-600 text-lg sm:text-xl">
+              Preview Images
+            </DialogTitle>
+          </DialogHeader>
 
-      <div className="md:hidden space-y-4">
-        {categories.map((item, index) => (
-          <div
-            key={index}
-            className="border rounded-lg p-4 shadow-sm bg-white flex flex-col gap-2"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{item.categoryName}</h2>
-              {item.image && (
-                <div className="w-12 h-12 rounded overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt="icon"
-                    width={48}
-                    height={48}
-                    className="object-cover w-full h-full"
-                    unoptimized={true}
-                  />
-                </div>
-              )}
-            </div>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap">
-              {item.description}
+          {selectedImages.length > 0 ? (
+            <Swiper
+              modules={[Navigation, Pagination]}
+              navigation
+              pagination={{ clickable: true }}
+              className="w-full h-[60vh] sm:h-[500px]"
+            >
+              {selectedImages.map((img, idx) => (
+                <SwiperSlide key={idx}>
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={img}
+                      alt={`image-${idx}`}
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <p className="text-sm text-gray-400 text-center p-6">
+              No images available.
             </p>
-            <div className="text-sm">
-              <strong>Event:</strong> {item.eventName}
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {loading ? (
+        <div className="md:hidden space-y-4 text-center text-sm text-gray-500 py-6">
+          Loading...
+        </div>
+      ) : (
+        <div className="md:hidden space-y-4">
+          {categories.map((item, index) => (
+            <div
+              key={index}
+              className="border rounded-lg p-4 shadow-sm bg-white flex flex-col gap-2"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">{item.categoryName}</h2>
+                <Button
+                  variant="outline"
+                  className="text-xs"
+                  onClick={() => {
+                    setSelectedImages(item.images || []);
+                    setOpenImageDialog(true);
+                  }}
+                >
+                  View Images
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600 whitespace-pre-wrap">
+                {item.description}
+              </p>
+              <div className="text-sm">
+                <strong>Event:</strong> {item.eventName}
+              </div>
+              <div className="text-sm">
+                <strong>Price:</strong> ₹{item.price}
+              </div>
+              <div className="flex gap-4 mt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(item)}
+                >
+                  <Pencil className="w-4 h-4 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => {
+                    setDeleteId(item._id);
+                    setDeleteOpen(true);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Delete
+                </Button>
+              </div>
             </div>
-            <div className="text-sm">
-              <strong>Price:</strong> ₹{item.price}
-            </div>
-            <div className="flex gap-4 mt-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleEdit(item)}
-              >
-                <Pencil className="w-4 h-4 mr-1" />
-                Edit
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => {
-                  setDeleteId(item._id);
-                  setDeleteOpen(true);
-                }}
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                Delete
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
