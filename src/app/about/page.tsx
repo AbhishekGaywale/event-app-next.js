@@ -17,7 +17,7 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto">
         {/* Heading */}
         <div className="text mb-16">
-          <h2 className="text-3xl md:text-3xl font-serif  text-[#51A4A8]">
+          <h2 className="text-3xl md:text-3xl font-serif  text-[#6A005F]">
             -About Us
           </h2>
           <p className="mt-3 text-gray-600 text-2xl font-serif font-semibold max-w-2xl">
@@ -45,7 +45,7 @@ export default function AboutPage() {
             </p>
             {/* CTA Button */}
             <div>
-              <button className="mt-2 inline-block px-6 py-3 rounded-full bg-sky-100 text-sky-900 font-medium shadow hover:bg-[#5c798b] transition duration-300">
+              <button className="mt-2 inline-block px-6 py-3 rounded-full bg-[#6A005F] text-white font-medium shadow hover:bg-[#8b5c87] transition duration-300">
                 Lets Plan Together
               </button>
             </div>

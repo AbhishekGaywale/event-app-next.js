@@ -181,7 +181,7 @@ export default function HappyCustPage() {
           viewport={{ once: true }}
           className="space-y-6"
         >
-          <h2 className="text-3xl font-serif font text-[#51A4A8] leading-tight">
+          <h2 className="text-3xl font-serif font text-[#6A005F] leading-tight">
             Why Choose Us?
           </h2>
           <p className="text-gray-700 text-lg font-semibold leading-relaxed">

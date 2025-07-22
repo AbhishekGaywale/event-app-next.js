@@ -46,7 +46,7 @@ export default function Testimonialpage() {
 
   return (
     <div className="px-4 py-10 bg-white">
-      <h1 className="text-3xl font-semibold font-serif text-center mb-10 text-[#51A4A8]">
+      <h1 className="text-3xl font-semibold font-serif text-center mb-10 text-[#6A005F]">
         What Our Customers Say
       </h1>
 
@@ -64,14 +64,14 @@ export default function Testimonialpage() {
         )}
         <button
           onClick={handlePrev}
-          className="absolute top-1/2 left-2 -translate-y-1/2 bg-[#D08700] text-white p-2 rounded-full shadow-md hover:bg-[#bd7c00] transition"
+          className="absolute top-1/2 left-2 -translate-y-1/2 bg-[#6A005F] text-white p-2 rounded-full shadow-md hover:bg-[#bd7c00] transition"
           aria-label="Previous testimonial"
         >
           <ChevronLeft size={24} />
         </button>
         <button
           onClick={handleNext}
-          className="absolute top-1/2 right-2 -translate-y-1/2 bg-[#D08700] text-white p-2 rounded-full shadow-md hover:bg-[#bd7c00] transition"
+          className="absolute top-1/2 right-2 -translate-y-1/2 bg-[#6A005F] text-white p-2 rounded-full shadow-md hover:bg-[#bd7c00] transition"
           aria-label="Next testimonial"
         >
           <ChevronRight size={24} />
@@ -95,14 +95,14 @@ export default function Testimonialpage() {
         </div>
         <button
           onClick={handlePrev}
-          className="absolute top-1/2 left-0 -translate-y-1/2 bg-[#9ac4cf] text-white p-3 rounded-full shadow-md hover:bg-[#bd7c00] transition"
+          className="absolute top-1/2 left-0 -translate-y-1/2 bg-[#6A005F] text-white p-3 rounded-full shadow-md hover:bg-[#bd7c00] transition"
           aria-label="Previous testimonials"
         >
           <ChevronLeft size={28} />
         </button>
         <button
           onClick={handleNext}
-          className="absolute top-1/2 right-0 -translate-y-1/2 bg-[#9ac4cf] text-white p-3 rounded-full shadow-md hover:bg-[#bd7c00] transition"
+          className="absolute top-1/2 right-0 -translate-y-1/2 bg-[#6A005F] text-white p-3 rounded-full shadow-md hover:bg-[#bd7c00] transition"
           aria-label="Next testimonials"
         >
           <ChevronRight size={28} />

@@ -70,10 +70,10 @@ export default function ServicePage() {
   return (
     <section className="bg-white py-10 px-2">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl text-center sm:text-3xl font-serif text-[#51A4A8] mb-7 tracking-tight">
+        <h2 className="text-2xl text-center sm:text-3xl font-serif text-[#6A005F] mb-7 tracking-tight">
           — Our Event Services
         </h2>
-        <p className="text-gray-700 text-2xl max-w-2xl text-center font-serif mx-auto mb-12">
+        <p className="text-[#4B4B4B] text-2xl max-w-2xl text-center font-serif mx-auto mb-12">
           Whether its a birthday, wedding, baby shower, or corporate event, we
           create unforgettable experiences tailored to your vision.
         </p>

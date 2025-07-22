@@ -17,7 +17,6 @@ interface Service {
   description: string;
   images: string[];
   highlights?: string[];
-  
 }
 
 interface EventCategory {
@@ -26,31 +25,19 @@ interface EventCategory {
   categoryName: string;
   description: string;
   images: string[];
-  price:number;
+  price: number;
 }
 
 export default function ServiceDetailPage() {
-const params = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
   const router = useRouter();
   const [service, setService] = useState<Service | null>(null);
   const [categories, setCategories] = useState<EventCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [isMobile, setIsMobile] = useState(false);
-
-  // useEffect(() => {
-  //   const checkMobile = () => {
-  //     setIsMobile(window.innerWidth < 768);
-  //   };
-    
-  //   checkMobile();
-  //   window.addEventListener('resize', checkMobile);
-  //   return () => window.removeEventListener('resize', checkMobile);
-  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch service details
         const serviceRes = await axios.get(`/api/events/${params.id}`);
         const serviceData = serviceRes.data;
 
@@ -67,16 +54,15 @@ const params = useParams<{ id: string }>();
           ],
         });
 
-        // Fetch categories filtered by event name
         const categoriesRes = await axios.get(
           `/api/event-category?eventName=${serviceData.name}`
         );
         const processedCategories = Array.isArray(categoriesRes.data)
           ? categoriesRes.data.map((cat: EventCategory) => ({
               ...cat,
-              images: Array.isArray(cat.images) 
-                ? cat.images 
-                : [cat.images || "/default-category.jpg"]
+              images: Array.isArray(cat.images)
+                ? cat.images
+                : [cat.images || "/default-category.jpg"],
             }))
           : [];
         setCategories(processedCategories);
@@ -96,7 +82,7 @@ const params = useParams<{ id: string }>();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#51A4A8]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6A005F]"></div>
       </div>
     );
   }
@@ -109,7 +95,7 @@ const params = useParams<{ id: string }>();
         </h1>
         <button
           onClick={() => router.push("/services")}
-          className="bg-[#51A4A8] text-white px-6 py-2 rounded-lg hover:bg-[#3e8a8e] transition"
+          className="bg-[#6A005F] text-white px-6 py-2 rounded-lg hover:bg-[#55004D] transition"
         >
           Browse Our Services
         </button>
@@ -129,12 +115,12 @@ const params = useParams<{ id: string }>();
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-opacity-30 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
           <div className="text-center px-4">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-serif tracking-wide">
               {service.name}
             </h1>
-            <div className="w-20 h-1 bg-[#51A4A8] mx-auto mb-6"></div>
+            <div className="w-20 h-1 bg-[#D4AF37] mx-auto mb-6"></div>
           </div>
         </div>
       </div>
@@ -174,7 +160,7 @@ const params = useParams<{ id: string }>();
           <div className="lg:w-1/2">
             <button
               onClick={() => router.back()}
-              className="mb-6 text-[#51A4A8] hover:text-[#3e8a8e] flex items-center font-medium"
+              className="mb-6 text-[#6A005F] hover:text-[#55004D] flex items-center font-medium"
             >
               ← Back to Services
             </button>
@@ -195,7 +181,7 @@ const params = useParams<{ id: string }>();
                 {service.highlights?.map((highlight, index) => (
                   <li key={index} className="flex items-start">
                     <svg
-                      className="h-5 w-5 text-[#51A4A8] mt-0.5 mr-2 md:mr-3 flex-shrink-0"
+                      className="h-5 w-5 text-[#6A005F] mt-0.5 mr-2 md:mr-3 flex-shrink-0"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -215,7 +201,7 @@ const params = useParams<{ id: string }>();
               </ul>
             </div>
 
-            <button className="w-full md:w-auto bg-[#51A4A8] hover:bg-[#3e8a8e] text-white px-6 py-3 md:px-8 md:py-3 rounded-lg font-medium text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <button className="w-full md:w-auto bg-[#6A005F] hover:bg-[#55004D] text-white px-6 py-3 md:px-8 md:py-3 rounded-lg font-medium text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
               Book This Service
             </button>
           </div>
@@ -227,7 +213,7 @@ const params = useParams<{ id: string }>();
             <h2 className="text-2xl md:text-3xl font-serif text-gray-800 mb-3">
               Perfect For These Events
             </h2>
-            <div className="w-20 h-1 bg-[#51A4A8] mx-auto"></div>
+            <div className="w-20 h-1 bg-[#D4AF37] mx-auto"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">

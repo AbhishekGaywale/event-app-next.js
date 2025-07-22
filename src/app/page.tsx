@@ -80,7 +80,7 @@ export default function Page() {
 {mounted && (
   <button
     onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-    className="fixed bottom-6 right-6 bg-[#51A4A8] hover:bg-[#3e898c] text-white p-3 rounded-full shadow-lg z-50 transition-transform hover:scale-110"
+    className="fixed bottom-6 right-6 bg-[#6A005F] hover:bg-[#483246] text-white p-3 rounded-full shadow-lg z-50 transition-transform hover:scale-110"
     aria-label="Scroll to Top"
   >
     <svg
