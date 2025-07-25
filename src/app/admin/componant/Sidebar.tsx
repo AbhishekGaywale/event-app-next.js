@@ -10,6 +10,7 @@ const navLinks = [
   { label: 'Services/Events', href: '/admin/services', icon: Calendar },
   { label: 'Event Category', href: '/admin/event-category', icon: Layers },
   { label: 'Testimonial', href: '/admin/testimonials', icon: MessageSquare },
+  { label: 'Gallery', href: '/admin/gallery', icon: MessageSquare },
 ];
 
 interface SidebarProps {

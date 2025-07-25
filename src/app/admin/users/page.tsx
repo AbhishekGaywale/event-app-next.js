@@ -147,6 +147,7 @@ export default function UserPage() {
                 </div>
                 <div className="space-y-2">
                   <Input
+                  disabled={true}
                     placeholder="Role"
                     value={newUser.role}
                     onChange={(e) =>
