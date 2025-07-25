@@ -11,7 +11,7 @@ export interface Image {
 }
 
 // Empty initial array
-let images: Image[] = [];
+const images: Image[] = [];
 
 export const getImages = (): Image[] => images;
 
